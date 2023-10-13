@@ -1,0 +1,114 @@
+CREATE PROCEDURE GetAllStudents
+AS
+BEGIN
+    SELECT * FROM Students;
+END;
+GO
+
+
+CREATE PROCEDURE AddStudent
+    @FirstName VARCHAR(50),
+	@LastName VARCHAR (50),
+    @Age INT,
+    @CourseID INT
+AS
+BEGIN
+    INSERT INTO Students (FirstName, LastName, Age, CourseID)
+    VALUES (@FirstName, @LastName, @Age, @CourseID);
+END;
+GO
+
+CREATE PROCEDURE UpdateStudentRecord
+    @ID INT,
+    @NewAge INT
+AS
+BEGIN
+    UPDATE Students
+    SET Age = @NewAge
+    WHERE StudentID = @ID;
+END;
+GO
+
+CREATE PROCEDURE DeleteStudent
+    @ID INT
+AS
+BEGIN
+    DELETE FROM Students
+    WHERE StudentID = @ID;
+END;
+GO
+
+
+
+CREATE PROCEDURE StudentsnotEnrolled
+AS
+BEGIN
+    SELECT FirstName, LastName
+FROM Students
+WHERE CourseID IS NULL;
+
+END;
+GO
+
+CREATE PROCEDURE MostPopularCourse
+AS
+BEGIN
+   SELECT CourseName, COUNT(*) AS totalstudents
+FROM Courses
+JOIN Students ON Students.CourseID = Courses.CourseID
+GROUP BY CourseName
+ORDER BY totalstudents DESC
+END;
+GO
+
+CREATE PROCEDURE StudentsOlder
+AS
+BEGIN
+  SELECT Students.FirstName, Students.LastName
+FROM Students
+WHERE Age > (SELECT AVG(Age) FROM Students);
+END;
+GO
+
+CREATE PROCEDURE Totalstudentsandaverageage
+AS
+BEGIN
+SELECT Courses.CourseName, COUNT(*) AS TotalStudents, AVG(Age) AS AverageAge
+FROM Students
+JOIN Courses ON Students.CourseID = Courses.CourseID
+GROUP BY Courses.CourseName;
+
+END;
+GO
+
+CREATE PROCEDURE Courseswithoutstudents
+AS
+BEGIN
+   SELECT Courses.CourseName
+FROM Courses
+LEFT JOIN Students ON Courses.CourseID = Students.CourseID
+WHERE Students.StudentID IS NULL
+END;
+GO
+
+CREATE PROCEDURE Courseshare
+AS
+BEGIN
+    SELECT FirstName, LastName
+FROM Students 
+WHERE CourseID IN (SELECT CourseID FROM Students WHERE StudentID =1);
+
+END;
+GO
+
+CREATE PROCEDURE Youngestandoldeststudent
+AS
+BEGIN
+    SELECT Courses.CourseName,
+MIN(Students.Age) AS YoungestStudent,
+MAX(Students.Age) AS OldestStudent
+FROM Students JOIN Courses ON Students.CourseID = Courses.CourseID
+GROUP BY Courses.CourseName;
+
+END;
+GO
